@@ -1,0 +1,439 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<title>Animals in The Sky</title>
+
+<!-- Welcome to ZIM at https://zimjs.com - Code Creativity!                              -->
+<!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS https://createjs.com -->
+<!-- ZIM is free to use. You can donate to help improve ZIM at https://zimjs.com/donate  -->
+
+<script src="https://zimjs.org/cdn/1.3.2/createjs.js"></script>
+<script src="https://zimjs.org/cdn/cat/01/zim.js"></script>
+<!-- use zimjs.com/distill for minified individual functions! -->
+
+<script>
+
+// SCALING OPTIONS
+// scaling can have values as follows with full being the default
+// "fit"	sets canvas and stage to dimensions and scales to fit inside window size
+// "outside"	sets canvas and stage to dimensions and scales to fit outside window size
+// "full"	sets stage to window size with no scaling
+// "tagID"	add canvas to HTML tag of ID - set to dimensions if provided - no scaling
+
+const scaling = "fit"; // this will resize to fit inside the screen dimensions
+const width = 1920;
+const height = 1080;
+const color = black; // ZIM colors like green, blue, pink, faint, clear, etc.
+const outerColor = black; // any HTML colors like "violet", "#333", etc. are fine to use
+const assets = ["sky.jpg", "ursamajor.png", "ursaminor.png","cygnus.png","capricorn.png","delphinus.png","leo.png", "jingle.mp3", {src:"https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap"}];
+const path = "assets/";
+
+const frame = new Frame(scaling, width, height, color, outerColor, assets, path);
+frame.on("ready", () => { // ES6 Arrow Function - like function(){}
+    zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
+
+    const stage = frame.stage;
+    let stageW = frame.width;
+    let stageH = frame.height;
+
+    // see https://zimjs.com/learn.html for video and code tutorials
+    // see https://zimjs.com/docs.html for documentation
+    // see https://zimjs.com/bits.html for 64 Interactive Media techniques
+
+    // *** NOTE: ZIM Cat defaults to time in seconds
+    // All previous versions, examples, videos, etc. have time in milliseconds
+    // This can be set back with TIME = "milliseconds" but we suggest you give it a try!
+    // There will be a warning in the conslole if your animation is not moving ;-)
+
+    // put your code here (you can delete this sample code)
+
+    //background image
+    const background = new Container(stageW,stageH).center().alp(.3).bot().noMouse();
+    const sky = asset("sky.jpg").center(background);
+
+    //set star nodes for constellations
+    const node = new Poly (12, 5, 2, white).centerReg(null,null,false);
+    //set linetype for constellation
+    const lines = new Line ({color:yellow, thickness:2});
+    //set var for jingle
+    let sound = asset("jingle.mp3");
+
+    //show instructions
+    showinstructions();
+    function showinstructions() {
+    let pane = new Pane({backgroundColor:clear, backdropColor:clear}).center();
+    let title = new Label({text:"animals in the sky", color:white, size:100, font: 'Amatic SC'}).centerReg(pane).mov(0,-60).alp(0);
+    let instructions = new Label ({text:"connect the stars & fill up the sky!",color:white, size:60, font:'Amatic SC'}).centerReg(pane).mov(0,20).alp(0);
+    title.animate({
+        props:{alpha:1},
+        time:1,
+        rewind:true,
+        rewindWait:3
+    });
+
+    instructions.animate({
+        props:{alpha:1},
+        time:1,
+        wait:3,
+        rewind:true
+    });
+    timeout(5.75,()=>{
+    pane.hide();
+    makeUrsaMajor(); //show makeursaMajor with instructions
+    stage.update();
+    });
+}
+//end inst
+//new Grid(); //(grid for reference)
+//makeUrsaMajor();
+function makeUrsaMajor(){
+const ursaMajorPoints = [[0,0],[78.2,67.4],[105.1,121.8],[144.4,187.5],[120.3,264.6],[233.4,352.1],[327.4,282.8],[144.4,187.5]];
+const ursaMajor = new Poly(25, 5, 2, white).centerReg().loc(100,100).noMouse();
+//instructions
+
+//animate first star to make it more eye-catching...
+ursaMajor.animate({
+    props: {alpha:.3, scale:.5},
+    time:.7,
+    ease:"linear",
+    easeFrequency: .5,
+    rewind:true,
+    loop:true
+    });
+
+const ursaMajorLines = new Connectors({
+    points: ursaMajorPoints,
+    linear:true,
+    linearOrder:true,
+    linearWrap:false,
+    node: node,
+    nodeRollColor:yellow,
+    line: lines,
+    dropType:"on",
+    dblclick:false,
+    deleteNode:false,
+}).loc(ursaMajor);
+
+const um1dots = new Container().loc(ursaMajor);
+//labels
+loop(ursaMajorLines.points,function (point, i){
+    const dots = new Poly(25,5,2,faint).loc(point[0]+20,point[1]-20,um1dots).noMouse();
+    const ursaMajorLabel = new Label ({text:i+1, color:white, valign:CENTER, align:CENTER, size: 30, font:'Amatic SC'}).loc(dots);
+    if (ursaMajorLabel.text == 4){ursaMajorLabel.mov(-50,30)}
+
+});
+//after connecting the dots
+ursaMajorLines.on("complete", ()=>{
+    let um1 = asset("ursamajor.png").alp(0).sca(.75).rot(35);
+    let um1Title = new Label({text:"ursa major",color:white, font:'Amatic SC', size:48}).alp(0);
+
+    ursaMajorLines.animate({alpha:.2, time:.5}); //
+    ursaMajor.stopAnimate(); //stop star animation
+    um1.centerReg(ursaMajorLines).mov(50,100).animate({props:{alpha:0.8}, time:2});
+    um1Title.loc(ursaMajor).mov(50,-20).animate({alpha:1, time:1});
+    sound.play(zog("hi"));
+    makeUrsaMinor();
+});
+stage.update();
+}
+
+//makeUrsaMinor();
+function makeUrsaMinor() {
+const ursaMinorPoints = [[0,0],[-38.7,-40.7],[-90.8,-63.1],[-140.5,-70.7],[-141.8,-123.2],[-234.2,-99.9],[-208,-52.4],[-140.5,-70.7]];
+const ursaMinor = new Poly(25, 5, 2, white).centerReg().loc(800,250).noMouse();
+ursaMinor.animate({
+    props: {alpha:.3, scale:.5},
+    time:.7,
+    ease:"linear",
+    easeFrequency: .5,
+    rewind:true,
+    loop:true
+});
+
+const ursaMinorLines = new Connectors({
+    points: ursaMinorPoints,
+    linear:true,
+    linearOrder:true,
+    linearWrap:false,
+    node: node,
+    nodeRollColor:yellow,
+    line: lines,
+    dropType:"on",
+    dblclick:false,
+    deleteNode:false,
+}).loc(ursaMinor);
+
+const um2dots = new Container().loc(ursaMinor);
+//labels
+loop(ursaMinorLines.points, function (point, i){
+    const dots = new Poly(25,5,2,faint).loc(point[0]+20,point[1]-20,um2dots).noMouse();
+    const ursaMinorLabel = new Label ({text:i+1, color:white, valign:CENTER, align:CENTER, size: 30, font:'Amatic SC'}).loc(dots);
+    if (ursaMinorLabel.text == 8){ursaMinorLabel.pos(650,210)}
+
+});
+
+ursaMinorLines.on("complete", ()=>{
+    let um2 = asset("ursaminor.png").alp(0).sca(.5).rot(-20);
+    let um2Title = new Label({text:"ursa minor",color:white, font:'Amatic SC', size:48}).alp(0);
+
+    ursaMinorLines.animate({alpha:.4, time:.5}); //
+    ursaMinor.stopAnimate(); //stop star animation
+    um2.centerReg(ursaMinorLines).mov(-110,-30).animate({alpha:0.8,time:2});
+    um2Title.loc(ursaMinor).mov(0,-80).animate({alpha:1,time:1});
+    sound.play();
+    makeCygnus();
+});
+stage.update();
+}
+
+
+//makeCygnus();
+function makeCygnus() {
+const cygnusPoints = [[0,0],[-58.5,64.1],[-127.9,231.2],[-29.7,182.6],[52.6,86.2],[159.9,7.2],[217.4,-132.1],[75.4,-34],[0,0],[222.1,275.3]];
+//make cygnus poly
+const cygnus = new Poly(25, 5, 2, white).centerReg().mov(-450,100).noMouse();
+cygnus.animate({
+    props: {alpha:.3, scale:.5},
+    time:.7,
+    ease:"linear",
+    easeFrequency: .5,
+    rewind:true,
+    loop:true
+    });
+
+    const cygnusLines = new Connectors({
+    points: cygnusPoints,
+    linear:true,
+    linearOrder:true,
+    linearWrap:false,
+    node: node,
+    nodeRollColor:yellow,
+    line: lines,
+    dropType:"on",
+    dblclick:false,
+    deleteNode:false,
+}).loc(cygnus);
+
+const cygnusdots = new Container().loc(cygnus);
+//labels
+loop(cygnusLines.points, function (point, i){
+    const dots = new Poly(25,5,2,faint).loc(point[0]+20,point[1]-20,cygnusdots).noMouse();
+    const cygnusLabel = new Label ({text:i+1, color:white, valign:CENTER, align:CENTER, size: 30, font:'Amatic SC'}).loc(dots);
+    if (cygnusLabel.text == 1){cygnusLabel.mov(-40,0)}
+
+});
+
+cygnusLines.on("complete", ()=>{
+    let cyg = asset("cygnus.png").alp(0).sca(1.5).rot(-215);
+    let cygTitle = new Label({text:"cygnus",color:white, font:'Amatic SC', size:48}).alp(0);
+
+    cygnusLines.animate({alpha:.6, time:.5}); //
+    cygnus.stopAnimate(); //stop star animation
+    cyg.centerReg(cygnusLines).mov(30,20).animate({alpha:0.8,time:2});
+    cygTitle.loc(cygnus).mov(-175,-40).animate({alpha:1,time:1});
+    sound.play();
+    makeCapricorn();
+});
+stage.update();
+}
+
+
+//makeCapricorn();
+function makeCapricorn() {
+const capricornPoints = [[0,0],[-246.4,50],[-428.5,39.2],[-468.4,30.4],[-351.6,165.5],[-263.8,231.7],[-175.9,277.1],[0,0]];
+const capricorn = new Poly(25, 5, 2, white).centerReg().mov(525,-400).rot(10).noMouse();
+capricorn.animate({
+    props: {alpha:.3, scale:.5},
+    time:.7,
+    ease:"linear",
+    easeFrequency: .5,
+    rewind:true,
+    loop:true
+});
+
+const capricornLines = new Connectors({
+    points: capricornPoints,
+    linear:true,
+    linearOrder:true,
+    linearWrap:false,
+    node: node,
+    nodeRollColor:yellow,
+    line: lines,
+    dropType:"on",
+    dblclick:false,
+    deleteNode:false,
+}).loc(capricorn).rot(10);
+
+const capricorndots = new Container().loc(capricorn);
+//labels
+loop(capricornLines.points, function (point, i){
+    const dots = new Poly(25,5,2,faint).loc(point[0]-40,point[1]-20,capricorndots).noMouse().rot(10);
+    const capricornLabel = new Label ({text:i+1, color:white, valign:BOTTOM, align:BOTTOM, size: 30, font:'Amatic SC'}).loc(dots);
+    if (capricornLabel.text == 4){capricornLabel.mov(0,-60)}
+    if (capricornLabel.text == 6){capricornLabel.mov(0,30)}
+    if (capricornLabel.text == 7){capricornLabel.mov(0,30)}
+    if (capricornLabel.text == 8){capricornLabel.mov(70,0)}
+
+});
+
+capricornLines.on("complete", ()=>{
+    let cap = asset("capricorn.png").alp(0).sca(.6).rot(35);
+    let capTitle = new Label({text:"capricorn",color:white, font:'Amatic SC', size:48}).alp(0);
+
+    capricornLines.animate({alpha:.6, time:.5}); //
+    capricorn.stopAnimate(); //stop star animation
+    cap.centerReg(capricornLines).mov(30,0).animate({alpha:0.8,time:2});
+    capTitle.loc(capricorn).mov(50,0).animate({alpha:1,time:1});
+    sound.play();
+    makeDelphinus();
+});
+stage.update();
+}
+
+//makeDelphinus();
+function makeDelphinus() {
+const delphinusPoints = [[0,0],[-63.8,-181.7],[-134.3,-196.1],[-101.3,-152.3],[-44.4,-128.7]];
+const delphinus = new Poly(25, 5, 2, white).centerReg().mov(750,75).noMouse();
+delphinus.animate({
+    props: {alpha:.3, scale:.5},
+    time:.7,
+    ease:"linear",
+    easeFrequency: .5,
+    rewind:true,
+    loop:true
+});
+
+const delphinusLines = new Connectors({
+    points: delphinusPoints,
+    linear:true,
+    linearOrder:true,
+    linearWrap:false,
+    node: node,
+    nodeRollColor:yellow,
+    line: lines,
+    dropType:"on",
+    dblclick:false,
+    deleteNode:false,
+}).loc(delphinus);
+
+const delphdots = new Container().loc(delphinus);
+//labels
+loop(delphinusLines.points, function (point, i){
+    const dots = new Poly(25,5,2,faint).loc(point[0]+20,point[1]-20,delphdots).noMouse();
+    const delphLabel = new Label ({text:i+1, color:white, valign:CENTER, align:CENTER, size: 30, font:'Amatic SC'}).loc(dots);
+    if (delphLabel.text == 4){delphLabel.mov(-40,40)}
+
+
+});
+
+delphinusLines.on("complete", ()=>{
+    let delph = asset("delphinus.png").alp(0).sca(.5);
+    let delphTitle = new Label({text:"delphinus",color:white, font:'Amatic SC', size:48}).alp(0);
+
+    delphinusLines.animate({alpha:.6, time:.5}); //
+    delphinus.stopAnimate(); //stop star animation
+    delph.centerReg(delphinusLines).mov(-10,0).animate({alpha:0.8,time:2});
+    delphTitle.loc(delphinus).mov(-225,0).animate({alpha:1,time:1});
+    sound.play();
+    makeLeo ();
+});
+stage.update();
+}
+
+//makeLeo();
+function makeLeo(){
+const leoPoints = [[0,0],[-178,-35.4],[-295.6,29],[-315.3,112.9],[-565.4,110.2],[-702.9,243],[-538.2,212.9],[-233.4,261],[-227.4,165.9],[-315.3,112.9]];
+const leo = new Poly(25, 5, 2, white).centerReg().mov(680,330).rot(40).noMouse();
+
+leo.animate({
+    props: {alpha:.3, scale:.5},
+    time:.7,
+    ease:"linear",
+    easeFrequency: .5,
+    rewind:true,
+    loop:true
+});
+
+const leoLines = new Connectors({
+    points: leoPoints,
+    linear:true,
+    linearOrder:true,
+    linearWrap:false,
+    node: node,
+    nodeRollColor:yellow,
+    line: lines,
+    dropType:"on",
+    dblclick:false,
+    deleteNode:false,
+}).loc(leo).rot(40);
+
+const leodots = new Container().loc(leo).rot(40);
+//labels
+loop(leoLines.points, function (point, i){
+    const dots = new Poly(25,5,2,faint).loc(point[0]+20,point[1]-20,leodots).noMouse();
+    const leoLabel = new Label ({text:i+1, color:white, valign:CENTER, align:CENTER, size: 30, font:'Amatic SC'}).loc(dots);
+    if (leoLabel.text == 4){leoLabel.mov(-50,-25)}
+    if (leoLabel.text == 6){leoLabel.mov(-55)}
+    if (leoLabel.text == 10){leoLabel.mov(10,25)}
+
+
+});
+
+
+leoLines.on("complete", ()=>{
+    let leos = asset("leo.png").alp(0).sca(1.3).rot(10);
+    let leoTitle = new Label({text:"leo",color:white, font:'Amatic SC', size:56}).alp(0);
+
+    leoLines.animate({alpha:.6, time:.5}); //
+    leo.stopAnimate(); //stop star animation
+    leos.centerReg(leoLines).mov(-40,20).animate({alpha:0.8,time:2});
+    leoTitle.loc(leo).mov(30,30).animate({alpha:1,time:1});
+    sound.play();
+    ending(); 
+});
+}
+
+//ending();
+function ending() {
+    let label = new Label({text:"thank you for playing!!", font:'Amatic SC',size:80});
+    let buttonLabel = new Label({text:"play again?", font:'Amatic SC',size:30,color:white});
+    let button = new Button(200,60,buttonLabel,"#090d40",light);
+    const ender = new Pane({
+        width:stageW/2,
+        height:stageH/2,
+        label:label,
+        shadowColor:dark,
+        shadowBlur: 30,
+        backgroundColor: "#FFFAFA",
+        color: "#090d40"})
+        .center().alp(0);
+
+        button.centerReg(ender).mov(0,150);
+
+        ender.animate({
+            props:{alpha:1},
+            time:3,
+            ease:"linear",
+            wait:4
+        });
+
+        button.on("click", ()=>{location.reload();});
+
+}
+
+    stage.update(); // this is needed to show any changes
+
+}); // end of ready
+
+</script>
+
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+
+</head>
+
+<body>
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+</body>
+</html>
